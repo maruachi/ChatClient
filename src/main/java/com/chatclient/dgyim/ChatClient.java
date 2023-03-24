@@ -29,7 +29,6 @@ public class ChatClient {
                     if ("SUCCESS".equals(response)) {
                         isLogin = true;
                         break;
-                        // 성공시에 chat을 연다
                     }
 
                     if ("FAIL".equals(response)) {
@@ -44,6 +43,11 @@ public class ChatClient {
             if (!isLogin) {
                 return;
             }
+
+            Writer clientWriter = IoUtils.toWriter(System.out);
+            String message = serverReader.readLine();
+            clientWriter.write(message);
+            clientWriter.write('\n');
 
             //서버 입장멘트
             //chat을 연다.
