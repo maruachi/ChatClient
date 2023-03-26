@@ -41,22 +41,52 @@ public class ChatClient {
             }
 
             if (!isLogin) {
+                clientReader.close();
+                socket.close();
                 return;
             }
 
+            //서버 입장멘트
             Writer clientWriter = IoUtils.toWriter(System.out);
-            String message = serverReader.readLine();
-            clientWriter.write(message);
+            String enterMessage = serverReader.readLine();
+            clientWriter.write(enterMessage);
             clientWriter.write('\n');
 
-            //서버 입장멘트
+
             //chat을 연다.
+            Thread receiveChatThread = new Thread(()->{
+                //서버에서 받는 챗
+                try {
+                    while (true) {
+                        String message = serverReader.readLine();
+                        if (message == null) {
+                            break;
+                        }
+                        clientWriter.write(message);
+                        clientWriter.write('\n');
+                    }
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                    // 여기에 socket close하면 빨간 줄 뜸... why??
+                }
+            });
+            receiveChatThread.start();
 
-            //서버로 보느는 챗
-
-            //서버에서 받는 챗
-
-
+            try {
+                while (true) {
+                    String message = clientReader.readLine();
+                    if (message == null) {
+                        break;
+                    }
+                    serverWriter.write(message);
+                    serverWriter.write('\n');
+                }
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+                socket.close();
+                clientWriter.close();
+                clientReader.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
