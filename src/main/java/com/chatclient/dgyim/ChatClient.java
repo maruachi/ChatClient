@@ -8,7 +8,13 @@ import java.net.Socket;
 public class ChatClient {
 
     public static final int PORT = 7777;
-    public static final String HOST = "192.168.0.56";
+    public static final String HOST = "192.168.0.55";
+
+    public static void main(String[] args) {
+        ChatClient chatClient = new ChatClient();
+
+        chatClient.run();
+    }
 
     public void run() {
         try {
@@ -21,9 +27,11 @@ public class ChatClient {
             boolean isLogin = false;
             while (true) {
                 try {
+                    System.out.print("Enter username password: ");
                     String loginLine = clientReader.readLine();
                     serverWriter.write(loginLine);
                     serverWriter.write('\n');
+                    serverWriter.flush();
 
                     String response = serverReader.readLine();
                     if ("SUCCESS".equals(response)) {
@@ -51,7 +59,7 @@ public class ChatClient {
             String enterMessage = serverReader.readLine();
             clientWriter.write(enterMessage);
             clientWriter.write('\n');
-
+            clientWriter.flush();
 
             //chat을 연다.
             Thread receiveChatThread = new Thread(()->{
@@ -64,6 +72,7 @@ public class ChatClient {
                         }
                         clientWriter.write(message);
                         clientWriter.write('\n');
+                        clientWriter.flush();
                     }
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
@@ -80,6 +89,7 @@ public class ChatClient {
                     }
                     serverWriter.write(message);
                     serverWriter.write('\n');
+                    serverWriter.flush();
                 }
             } catch (IOException ioException) {
                 ioException.printStackTrace();
